@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% block content %}
+        <main class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
+        <h1>Content Insights</h1>
+        <DashboardTable>
+            <DashboardRow>
+              <DashboardColumn>
+                    <h4><div class="chartTitle" id="label-domain"></div></h4>
+                    <div id="row-chart-domain" class="col-sm-6"></div>
+              </DashboardColumn>
+              <DashboardColumn>
+                  <h4><div class="chartTitle" id="label-category"></div></h4>
+                  <div id="row-chart-category" class="col-sm-6"></div>
+                </DashboardColumn>
+          </DashboardRow>      
+        </DashboardTable>
+<script>
+d3.csv("{{ url_for('static', filename='data/MDG_Combined_Audience-Exposure_Dataset.csv')}}").then(function(data) {     
+    //if (error) throw error;
+    data.forEach(function(d) {
+    d["Exposed"] = +d["Exposed"];
+    d["Not exposed"] = +d["Not exposed"];
+    d["Targetable"]=+d["Targetable"];
+  });
+
+    ndx=crossfilter(data);
+
+    domainDim                   =   ndx.dimension(function(d){return d["Domain"]});
+    domainGroup                 =   domainDim.group();
+    categoryDim                 =   ndx.dimension(function(d){return d["iab_category_name"]});
+    categoryGroup               =   categoryDim.group();
+
+
+    var allDomains=domainGroup.all();
+    var allCategories=categoryGroup.all();
+
+    function removeEmptyBins(source_group) {
+        var bins=Array.prototype.slice.call(arguments,1);
+        return{
+            all:function()
+            {
+                return source_group.all().filter(function(d){
+                    if (d.key!="")
+                    {
+                        return d;
+                    }
+                })
+            }
+        };
+    }
+    
+    function removeSmallBins(source_group,count) {
+        var bins=Array.prototype.slice.call(arguments,1);
+        return{
+            all:function()
+            {
+                return source_group.all().filter(function(d){
+                    var percent=(d.value/count)*100;
+                    //console.log("percent="+percent);
+                    if (percent>1)
+                    {
+                        return d;
+                    }
+                })
+            }
+        };
+    }
+
+
+
+
+    function getTops(source_group,count) {
+        return{
+            all:function()
+            {
+                if (count==0)//Send all groups
+                {
+                    return source_group.all();
+                }
+                else
+                {
+                    return source_group.top(count);
+                }
+            }
+        };
+    }
+
+  var DomainRowChart  = dc.rowChart("#row-chart-domain","reductio");
+  var totalDomainCount=0;
+  for(i=0;i<allDomains.length;i++)
+  {
+    totalDomainCount=totalDomainCount+allDomains[i].value;
+  }
+  var Topdomain       =   getTops(domainGroup,10);
+  //console.log(Topdomain.all());
+  var nonEmptyDomains =   removeEmptyBins(Topdomain);
+  //console.log("non empty");
+  //console.log(nonEmptyDomains.all());
+  var bigBucketDomains=removeSmallBins(nonEmptyDomains,totalDomainCount)
+  //console.log("big buckets");
+  //console.log(bigBucketDomains.all());
+
+    //console.log(Topdomain.all());
+  DomainRowChart
+  .margins({ top: 20, right: 70, bottom: 40, left: 200 })
+  .height(400)
+  .width(650)
+  .dimension(domainDim)
+  .group(bigBucketDomains)
+  .elasticX(true)
+  .labelOffsetX(-130)
+  .colorAccessor(function(d){return d.key})
+  //.fixedBarHeight(30)
+  .colors(d3.scaleOrdinal().range(['#3A8DDE','#93D500','#898A8D',"#236BA1","#36B6E9","#E5A447","#71B043","#EEEEEE","#F6F6F6"]))
+  .renderlet(function()
+  {
+      //rows=d3.selectAll("#row-chart-domain svg g.row rect")
+      rows=d3.selectAll("#row-chart-domain svg g.row")
+      console.log("ppp");
+    console.log(rows)
+    var data;
+    var percent
+    var rowGroup=rows._groups[0];
+    for(var i=0;i<rowGroup.length;i++)
+    {
+      data=rowGroup[i].childNodes[0].__data__.value;
+      console.log("data="+data);
+      percent=((data/totalCategoryCount)*100).toFixed(2)+"%";
+      console.log("percent="+percent);
+      //var bar_y           = this.y.baseVal.value;
+      //var bar_x           = this.x.baseVal.value;
+      var bar_Width         = rowGroup[i].childNodes[0].width.baseVal.value;
+      var bar_height        = rowGroup[i].childNodes[0].height.baseVal.value;
+      var bar_offset_x      = bar_Width+3;
+      var bar_offset_y    = bar_height/2;
+      var labelx          = bar_offset_x;
+      var labely          = bar_offset_y;
+      console.log(rowGroup[i]);      
+      d3.select(rowGroup[i]).append("text")
+      .attr("x",labelx)
+      .attr("y",labely)
+      .attr("fill",'#000000')
+      .attr("class","barlabel")
+      .text(percent);
+      $("#label-domain").text("Impressions by Domain");
+
+     }
+    
+    });
+  var totalCategoryCount=0;
+  for(i=0;i<allCategories.length;i++)
+  {
+    totalCategoryCount=totalCategoryCount+allCategories[i].value;
+  }
+  var TopCategories       =   getTops(categoryGroup,10);
+  //console.log(TopCategories.all());
+  var nonEmptyCategories =   removeEmptyBins(TopCategories);
+  //console.log("non empty");
+  //console.log(nonEmptyCategories.all());
+  var bigBucketCategories=removeSmallBins(nonEmptyCategories,totalCategoryCount)
+  //console.log("big buckets");
+  //console.log(bigBucketCategories.all());
+
+  var CategoryRowChart    =   dc.rowChart("#row-chart-category","reductio");
+  //var TopCategory         =   getTops(categoryGroup,10);
+  //console.log(TopCategory.all());
+  
+  CategoryRowChart
+  .margins({ top: 20, right: 70, bottom: 40, left: 200 })
+  .height(400)
+  .width(600)
+  .dimension(categoryDim)
+  .group(bigBucketCategories)
+  .elasticX(true)
+  .labelOffsetX(-130)
+  .colorAccessor(function(d){return d.key})
+  //.fixedBarHeight(30)
+  .colors(d3.scaleOrdinal().range(['#3A8DDE','#93D500','#898A8D',"#236BA1","#36B6E9","#E5A447","#71B043","#EEEEEE","#F6F6F6"]))
+  .renderlet(function()
+  {
+    rows=d3.selectAll("#row-chart-category svg g.row")
+    console.log("ppp");
+    console.log(rows)
+    var data;
+    var percent
+    var rowGroup=rows._groups[0];
+    for(var i=0;i<rowGroup.length;i++)
+    {
+      data=rowGroup[i].childNodes[0].__data__.value;
+      console.log("data="+data);
+      percent=((data/totalDomainCount)*100).toFixed(2)+"%";
+      console.log("percent="+percent);
+      //var bar_y           = this.y.baseVal.value;
+      //var bar_x           = this.x.baseVal.value;
+      var bar_Width         = rowGroup[i].childNodes[0].width.baseVal.value;
+      var bar_height        = rowGroup[i].childNodes[0].height.baseVal.value;
+      var bar_offset_x      = bar_Width+3;
+      var bar_offset_y    = bar_height/2;
+      var labelx          = bar_offset_x;
+      var labely          = bar_offset_y;
+      console.log(rowGroup[i]);      
+      d3.select(rowGroup[i]).append("text")
+      .attr("x",labelx)
+      .attr("y",labely)
+      .attr("fill",'#000000')
+      .attr("class","barlabel")
+      .text(percent);
+     }
+     $("#label-category").text("Top Content Categories");
+  });
+  
+  dc.renderAll("reductio");
+  function ShowPercentagesCategory() {
+    var rows;
+    rows=d3.selectAll("#row-chart-category svg g.row rect")
+    console.log(rows);
+    //rectPath="#row-chart-domain svg g.row rect";
+    //console.log(rectPath);
+    //var rows=d3.selectAll(rectPath);
+    
+    //rows._groups[0][0].__data__.value
+    var stack   =   d3.select('g.stack');
+    var data;
+    var percent
+    var rowGroup=rows._groups[0];
+    for(var i=0;i<rowGroup.length;i++)
+    {
+      data=rowGroup[i].__data__.value;
+      console.log("data="+data);
+      percent=((data/count)*100).toFixed(2)+"%";
+      console.log("percent="+percent);
+      var bar_y           = this.y.baseVal.value;
+            var bar_x           = this.x.baseVal.value;
+            var bar_Width       = this.width.baseVal.value;
+            var bar_height      = this.height.baseVal.value;
+            var bar_offset_x    = bar_Width/2-20;
+            var bar_offset_y    = bar_height/2;
+            var labelx          = bar_x+bar_offset_x;
+            var labely          = bar_y+bar_offset_y;
+            var bar_val         = $(this).find('title').html().split(':')[1];
+            var percent         =((bar_val/totalcount)*100).toFixed(2)+"%";
+            
+            stack.append("text")
+            .attr("x",labelx)
+            .attr("y",labely)
+            .attr("fill",'#ffffff')
+            .attr("class","barlabel")
+            .text(percent);
+
+
+
+
+
+
+    }
+    /*
+    rows.each(function (i, item) {
+        var bar_y           = this.y.baseVal.value;
+        var bar_x           = this.x.baseVal.value;
+        var bar_Width       = this.width.baseVal.value;
+        var bar_height      = this.height.baseVal.value;
+        var bar_offset_x    = bar_Width/2-20;
+        var bar_offset_y    = bar_height/2;
+        var labelx          = bar_x+bar_offset_x;
+        var labely          = bar_y+bar_offset_y;
+        var bar_val         = $(this).find('title').html().split(':')[1];
+        var percent         =((bar_val/totalcount)*100).toFixed(2)+"%";
+        
+        stack.append("text")
+        .attr("x",labelx)
+        .attr("y",labely)
+        .attr("fill",'#ffffff')
+        .attr("class","barlabel")
+        .text(percent);
+    */        
+}
+
+  function ShowPercentagesDomain() {
+    //var $chart  =   $('#bar-chart-DeviceType')
+    //var bar     =   $chart.find('.bar');
+    //var rows    =   d3.selectAll('rect');
+    var rows;
+    //rows=d3.selectAll("#row-chart-domain svg g.row rect")
+    rows=d3.selectAll("rect")
+
+    console.log("-------------");
+    console.log(rows);
+    console.log("+++++++++++++++++++++++");
+    //rectPath="#row-chart-domain svg g.row rect";
+    //console.log(rectPath);
+    //var rows=d3.selectAll(rectPath);
+    
+    //rows._groups[0][0].__data__.value
+    var stack   =   d3.select('g.stack');
+    var data;
+    var percent
+    var rowGroup=rows._groups[0];
+    for(var i=0;i<rowGroup.length;i++)
+    {
+      data=rowGroup[i].__data__.value;
+      console.log("data="+data);
+      percent=((data/count)*100).toFixed(2)+"%";
+      console.log("percent="+percent);
+
+    }
+    /*
+    rows.each(function (i, item) {
+        var bar_y           = this.y.baseVal.value;
+        var bar_x           = this.x.baseVal.value;
+        var bar_Width       = this.width.baseVal.value;
+        var bar_height      = this.height.baseVal.value;
+        var bar_offset_x    = bar_Width/2-20;
+        var bar_offset_y    = bar_height/2;
+        var labelx          = bar_x+bar_offset_x;
+        var labely          = bar_y+bar_offset_y;
+        var bar_val         = $(this).find('title').html().split(':')[1];
+        var percent         =((bar_val/totalcount)*100).toFixed(2)+"%";
+        
+        stack.append("text")
+        .attr("x",labelx)
+        .attr("y",labely)
+        .attr("fill",'#ffffff')
+        .attr("class","barlabel")
+        .text(percent);
+    */        
+}
+
+
+});
+
+
+
+
+
+  function htmlbodyHeightUpdate(){
+  var height3 = $( window ).height()
+  var height1 = $('.nav').height()+50
+  height2 = $('.main').height()
+  if(height2 > height3){
+    $('html').height(Math.max(height1,height3,height2)+10);
+    $('body').height(Math.max(height1,height3,height2)+10);
+  }
+  else
+  {
+    $('html').height(Math.max(height1,height3,height2));
+    $('body').height(Math.max(height1,height3,height2));
+  }
+  
+}
+	$(document).ready(function () {
+		htmlbodyHeightUpdate()
+		$( window ).resize(function() {
+			htmlbodyHeightUpdate()
+		});
+		$( window ).scroll(function() {
+			height2 = $('.main').height()
+  			htmlbodyHeightUpdate()
+		});
+	});
+</script>
+  {%endblock%}
+
+
+ 

@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block content %}
+        <main class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
+        <h1>Impressions by Device Type</h1>
+        <DashboardTable>
+        <DashboardRow>
+            <DashboardColumn>
+                <h4><div class="chartTitle" id="label-DeviceType"></div></h4>
+                <div id="bar-chart-DeviceType" class="col-sm-6"></div>
+            </DashboardColumn>
+        </DashboardTable>
+<script>
+d3.csv("{{ url_for('static', filename='data/MDG_Combined_Audience-Exposure_Dataset.csv')}}").then(function(data) {     
+    //if (error) throw error; 
+    data.forEach(function(d) {
+    d["Exposed"] = +d["Exposed"];
+    d["Not exposed"] = +d["Not exposed"];
+    d["Targetable"]=+d["Targetable"];
+  });
+
+    ndx=crossfilter(data);
+    deviceDim                   =   ndx.dimension(function(d){return d["mobile_device_type"]});
+    deviceGroup                 =   deviceDim.group();
+    exposedDim                   =   ndx.dimension(function(d){return d["Exposed"]});
+    //exposedDim.filter(1);
+    function getTops(source_group,count) {
+        return{
+            all:function()
+            {
+                if (count==0)//Send all groups
+                {
+                    return source_group.all();
+                }
+                else
+                {
+                    return source_group.top(count);
+                }
+            }
+        };
+    }
+
+
+    var DeviceBarChart  = dc.barChart("#bar-chart-DeviceType","reductio");
+
+    var nonEmptyDeviceType=removeEmptyBins(deviceGroup);
+
+    var totalcount=0;
+    var allDeviceTypes=nonEmptyDeviceType.all();
+    for(i=0;i<allDeviceTypes.length;i++)
+    {
+        totalcount=totalcount+allDeviceTypes[i].value;
+    }
+
+    function removeEmptyBins(source_group) {
+        var bins=Array.prototype.slice.call(arguments,1);
+        return{
+            all:function()
+            {
+                return source_group.all().filter(function(d){
+                    if (d.key!="")
+                    {
+                        return d;
+                    }
+                })
+            }
+        };
+    }
+    var bigBuckets=removeSmallBins(nonEmptyDeviceType,totalcount)
+    function removeSmallBins(source_group,count) {
+        var bins=Array.prototype.slice.call(arguments,1);
+        return{
+            all:function()
+            {
+                return source_group.all().filter(function(d){
+                    var percent=(d.value/count)*100;
+                    if (percent>5)
+                    {
+                        return d;
+                    }
+                })
+            }
+        };
+    }
+    DeviceBarChart
+    .margins({top: 50, right: 20, left: 50, bottom: 50})
+    .width(500)
+    .height(400)
+    .gap(50)
+    .x(d3.scaleBand())
+    .xUnits(dc.units.ordinal)
+    .brushOn(false)
+    .xAxisLabel('Device Type')
+    .yAxisLabel('Impressions')
+    .dimension(deviceDim)
+    .barPadding(0.1)
+    .outerPadding(0.05)
+    .group(bigBuckets)
+    .colorAccessor(function(d){return d.key})
+    .colors(d3.scaleOrdinal().range(['#3A8DDE','#93D500','#898A8D',"#236BA1","#36B6E9","#E5A447","#71B043","#EEEEEE","#F6F6F6"]))
+    .renderlet(moveGroupNames); 
+
+    function moveGroupNames() {
+        var $chart  =   $('#bar-chart-DeviceType')
+        var bar     =   $chart.find('.bar');
+        var stack   =   d3.select('g.stack');
+        bar.each(function (i, item) {
+            var bar_y           = this.y.baseVal.value;
+            var bar_x           = this.x.baseVal.value;
+            var bar_Width       = this.width.baseVal.value;
+            var bar_height      = this.height.baseVal.value;
+            var bar_offset_x    = bar_Width/2-20;
+            var bar_offset_y    = bar_height/2;
+            var labelx          = bar_x+bar_offset_x;
+            var labely          = bar_y+bar_offset_y;
+            var bar_val         = $(this).find('title').html().split(':')[1];
+            var percent         =((bar_val/totalcount)*100).toFixed(2)+"%";
+            
+            stack.append("text")
+            .attr("x",labelx)
+            .attr("y",labely)
+            .attr("fill",'#ffffff')
+            .attr("class","barlabel")
+            .text(percent);
+                
+    })
+}
+
+    dc.renderAll("reductio");
+});
+
+
+    function htmlbodyHeightUpdate(){
+		var height3 = $( window ).height()
+		var height1 = $('.nav').height()+50
+		height2 = $('.main').height()
+		if(height2 > height3){
+			$('html').height(Math.max(height1,height3,height2)+10);
+			$('body').height(Math.max(height1,height3,height2)+10);
+		}
+		else
+		{
+			$('html').height(Math.max(height1,height3,height2));
+			$('body').height(Math.max(height1,height3,height2));
+		}
+		
+	}
+	$(document).ready(function () {
+		htmlbodyHeightUpdate()
+		$( window ).resize(function() {
+			htmlbodyHeightUpdate()
+		});
+		$( window ).scroll(function() {
+			height2 = $('.main').height()
+  			htmlbodyHeightUpdate()
+		});
+	});
+</script>
+  {%endblock%}
+
+
+ 

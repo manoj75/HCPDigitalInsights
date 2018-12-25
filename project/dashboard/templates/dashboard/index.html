@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+
+        <main class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
+        <h1>Campaigns</h1>
+        <DashboardTable>
+        {% for campaign in campaigns %}
+            <DashboardRow>
+              <DashboardColumn>
+                    <div class="col-sm-6"><a href="{{url_for('dashboard.ShowCampaign',id=campaign.id)}}">{{ campaign.name}}</a></div>
+              </DashboardColumn>
+          </DashboardRow>      
+          {% endfor %}
+
+        </DashboardTable>
+  {%endblock%}
+
+
+ 

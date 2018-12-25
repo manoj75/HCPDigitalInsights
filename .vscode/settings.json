@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "${workspaceFolder}\\env\\Scripts\\python.exe",
+    "appService.defaultWebAppToDeploy": "/subscriptions/c09820d1-2091-4867-b38b-28895511658f/resourceGroups/appsvc_rg_windows_centralus/providers/Microsoft.Web/sites/HCPDigitalInsights",
+    "appService.deploySubpath": ""
+}

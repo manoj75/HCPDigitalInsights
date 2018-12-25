@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container ">
+    <h1 class="form-heading">Add New Campaign</h1>
+    <div class="login-form">
+        <div class="main-div">
+            <!--<form id="Login">-->
+            <form class="form-signin" id="Login" method="POST" action="{{url_for('admin.AddNewCampaign')}}">
+                {{newCampaignForm.hidden_tag()}}
+                <div class="form-group">
+                    {{newCampaignForm.name}} 
+                </div>
+                <div class="row">
+					<div class="col-sm-6 remember text-left"> 
+                        <p> {{newCampaignForm.customer}} </p>
+                    </div>					
+                </div>
+                {%if success%}
+                <div class="alert alert-success" role="alert">
+                        New Campaign Created!
+                </div>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+        <p class="logo-bottom">powered by<br><img src="{{ url_for('static', filename='images/logo-mdg-alt.png')}}" height="50px" alt="MedData Group" /></p>
+    </div>
+</div>
+{%endblock%}

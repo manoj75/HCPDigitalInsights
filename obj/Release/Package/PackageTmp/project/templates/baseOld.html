@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HCP Digital Insights</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <!--
+    
+    --<link rel="stylesheet" href="{{ url_for('static', filename='css/hcpdigital.css') }}">--
+    
+    <script src="{{ url_for('static', filename='js/jquery-3.1.1.slim.min.js')}}"></script>
+
+    -- IE10 viewport hack for Surface/desktop Windows 8 bug --
+    <script src="{{ url_for('static', filename='js/ie10-viewport-bug-workaround.js')}}"></script>
+  -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"> 
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"> 
+  <!--<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
+  <script src="{{ url_for('static', filename='js/tether.min.js')}}"></script>  
+  <script src="{{ url_for('static', filename='js/jquery-3.1.1.slim.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/d3.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/crossfilter.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/dc.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/reductio.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/powerbi.min.js') }}"></script>
+    <!--
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    -->
+    <link href="https://harvesthq.github.io/chosen/chosen.css" rel="stylesheet" />
+    <script src="https://harvesthq.github.io/chosen/chosen.jquery.js"></script>
+
+    
+    <script>
+        $(document).ready(function() {
+
+          //console.log($('#ddSegment'));
+          //$('#ddSegment').select2();
+          $(".chosen-select").chosen({no_results_text: "Oops, nothing found!"}); 
+      });
+      $(document).ready(function() {
+      //$('.mdb-select').materialSelect();
+    });
+        </script>
+      
+  </head>
+  <body>
+    
+    <!-- Navigation -->
+    
+    <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+      <button class="navbar-toggler navbar-toggler-right hidden-lg-up" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='images/HCP-Digital-Insights_Logo.png')}}" height="47px"></a>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">Home<span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Settings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Help</a>
+          </li>
+        </ul>
+        
+      </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-xs-1 p-l-0 p-r-0" id="sidebar">
+            <aside>
+                <nav class="navbar navbar-inverse sidebar navbar-fixed-top" role="navigation">
+                    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+              
+              <div class="nav-side-menu">
+                  <i class="fa fa-bars fa-2x toggle-btn" data-toggle="collapse" data-target="#menu-content"></i>
+                
+                      <div class="menu-list">
+                
+                          <ul id="menu-content" class="menu-content collapse out">
+                              <li data-toggle="collapse" data-target="#campaigns" class="collapsed">
+                                  <a href="#"><i class="fa fa-globe fa-lg"></i> Campaigns <span class="arrow"></span></a>
+                                </li>  
+                                <ul class="sub-menu collapse" id="campaigns">
+                                  <li><a href="{{url_for('dashboard.Campaign',id=1000)}}">Campaign 1</a></li>
+                                  <li><a href="{{url_for('dashboard.Campaign',id=1001)}}">Campaign 2</a></li>
+                              </ul>
+
+                              <li>
+                                <a href="#">
+                                <i class="fa fa-dashboard fa-lg"></i> Campaign Information
+                                </a>
+                              </li>
+                              <li data-toggle="collapse" data-target="#service" class="collapsed">
+                                <a href="#"><i class="fa fa-globe fa-lg"></i> Insights Dashboards <span class="arrow"></span></a>
+                              </li>  
+                              <ul class="sub-menu collapse" id="service">
+                                    <li><a href="{{url_for('dashboard.DeviceTypes')}}">Device Types</a></li>
+                                    <li><a href="{{url_for('dashboard.ProfessionalInsights')}}">Professional Insights</a></li>
+                                    <li><a href="{{url_for('dashboard.ContentInsights')}}">Content Insights</a></li>
+                                </ul>
+                  
+              
+                              <li data-toggle="collapse" data-target="#new" class="collapsed">
+                                <a href="#"><i class="fa fa-car fa-lg"></i> Dashboard Filters <span class="arrow"></span></a>
+                              </li>
+                              <ul class="sub-menu collapse" id="new">
+                                <li>                    
+                                  Segment:
+                                  <!--<select id="ddSegment">-->
+                                  <!--<select class="js-example-basic-multiple" id="ddSegment" multiple="multiple">-->
+                                    <!--<select class="mdb-select md-form colorful-select dropdown-primary" multiple searchable="Search here..">-->
+                                      <!--
+                                        <select data-placeholder="Choose a country..." multiple class="chosen-select11">
+                                      {% for segment in segments %}
+                                      <option value="{{ segment.id }}" >{{ segment.name}}</option>
+                                      {% endfor %}
+                                      </select>
+                                    -->
+                                </li>
+                                <li>                                  
+                                  <!--  
+                                  Professions:
+                                    <select id="ddprofession1">
+                                        {% for profession in professions %}
+                                        <option value="{{ profession.id }}" >{{ profession.name}}</option>
+                                        {% endfor %}
+                                      </select>
+                                    -->
+                                </li>
+                                <li>
+                                  <!--                                    
+                                  Specialty Groups:
+                                    <select id="ddspecialtyGroup1">
+                                      {% for specialtyGroup in specialtyGroups %}
+                                      <option value="{{ specialtyGroup.id }}" >{{ specialtyGroup.name}}</option>
+                                      {% endfor %}
+                                    </select>
+                                  -->
+                                </li>
+                                <li> 
+                                  <!--                                   
+                                    Regions:
+                                      <select id="ddGeoRegion1">
+                                        {% for region in geoRegions %}
+                                        <option value="{{ region.id }}" >{{ region.name}}</option>
+                                        {% endfor %}
+                                      </select>
+                                    -->
+                                  </li>
+                              </ul>
+                               <li>
+                                <a href="#">
+                                <i class="fa fa-user fa-lg"></i> Campaign Optimization
+                                </a>
+                                </li>
+              
+                               <li>
+                                <a href="#">
+                                <i class="fa fa-users fa-lg"></i> Export Dashboard
+                                </a>
+                              </li>
+                              <li>
+                                  <a href="#">
+                                  <i class="fa fa-users fa-lg"></i> Print Dashboard
+                                  </a>
+                              </li>
+                              <li>
+                                  <a href="#">
+                                  <i class="fa fa-users fa-lg"></i> Support
+                                  </a>
+                              </li>
+
+                          </ul>
+                   </div>
+              </div>
+                </nav>
+                
+              </aside>
+            </div>
+    ppp={{model}}
+
+    <!-- Page Content -->
+      {%block content%}
+      {%endblock%}
+      {% block footer %}
+<!--
+        <footer class="footer">
+          <div class="container">
+            <span class="text-muted">Place sticky footer content here.</span>
+          </div>
+        </footer>
+      -->  
+        {%endblock%}     
+
+  </body>
+</html>

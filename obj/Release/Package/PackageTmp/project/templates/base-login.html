@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCP Digital Insights</title>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-NJXGk7R+8gWGBdutmr+/d6XDokLwQhF1U3VA7FhvBDlOq7cNdI69z7NQdnXxcF7k" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mdg.css') }}">
+
+<script src="{{ url_for('static', filename='js/tether.min.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/d3.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/crossfilter.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/dc.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/reductio.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/powerbi.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/mdg.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+</head>
+
+<body id="login">
+{%block content%}
+{%endblock%}
+{% block footer %}
+{%endblock%}
+</body>
+</html>

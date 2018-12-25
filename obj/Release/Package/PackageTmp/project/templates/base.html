@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HCP Digital Insights</title>
+<!--
+    
+    --<link rel="stylesheet" href="{{ url_for('static', filename='css/hcpdigital.css') }}">--
+    
+    <script src="{{ url_for('static', filename='js/jquery-3.1.1.slim.min.js')}}"></script>
+
+    -- IE10 viewport hack for Surface/desktop Windows 8 bug --
+    <script src="{{ url_for('static', filename='js/ie10-viewport-bug-workaround.js')}}"></script>
+  -->
+<!--  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">-->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.min.css') }}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-NJXGk7R+8gWGBdutmr+/d6XDokLwQhF1U3VA7FhvBDlOq7cNdI69z7NQdnXxcF7k" crossorigin="anonymous">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mdg.css') }}"> 	
+<script src="{{ url_for('static', filename='js/tether.min.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/powerbi.min.js') }}"></script>
+<!--<script type="text/javascript" src="{{ url_for('static', filename='js/mdg.js') }}"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chosen.css') }}"> 	
+<script type="text/javascript" src="{{ url_for('static', filename='js/chosen.jquery.js') }}"></script>
+</head>
+<body>
+<header class="header">
+    <nav class="navbar navbar-toggleable-md navbar-light fixed-top">
+        <a class="nav-link dropdown-toggle navbar-toggleable-md navbar-toggler" href="#" data-toggle="dropdown" data-target="#mobile-nav" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user-circle"></i> </a>
+        <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='images/logo-insights.png')}}" height="70px" alt="HCP Digital Insights Logo" /></a>
+        <!--
+        <div class="float-left"> <a href="#" class="button-left"><i class="far fa-bars"></i></a> </div>
+        -->
+        <div class="float-left client-name">{{customer_name}}</div>
+        <div class="collapse navbar-collapse flex-row-reverse" id="mobile-nav">
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown  user-menu"> <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{{ url_for('static', filename='images/logo-mdg.png')}}" height="70px" alt="HCP Digital Insights Logo" /> <span class="hidden-xs"><i class="fas fa-user-circle"></i> {{current_user.username}}</span> </a>
+                    <div class="dropdown-menu collapse"> <a class="dropdown-item" href="#">My Account</a> <a class="dropdown-item" href="#">Sample Link 2</a> <a class="dropdown-item" href="{{url_for('login.logout')}}">Logout</a> </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
+    
+<!--<div class="main fliph">-->
+<div class="main">
+        <div class="sidebar left" id="sidenav">
+            <ul class="list-sidebar bg-defoult">
+                <li><a href="{{url_for('dashboard.Index')}}"><i class="fas fa-ad"></i> <span class="nav-label">My Campaigns</span></a></li>
+                <!--<li><a href="#"><i class="fas fa-info-circle"></i> <span class="nav-label">Campaign Information</span></a></li>-->
+                <!--<li>
+                    <a href="#" data-toggle="collapse" data-target="#insights-dashboards" class="collapsed"> <i class="fas fa-tachometer-alt"></i> <span class="nav-label"> Insights Dashboards</span> </a>
+                    <ul class="sub-menu collapse" id="insights-dashboards">
+                        <li><a href="{{url_for('dashboard.DeviceTypes')}}">Device Types</a></li>
+                        <li><a href="{{url_for('dashboard.ProfessionalInsights')}}">Professional Insights</a></li>
+                        <li><a href="{{url_for('dashboard.ContentInsights')}}">Content Insights</a></li>
+                    </ul>
+                </li>
+                -->
+                <li><a href="#"><i class="fas fa-magic"></i> <span class="nav-label">Campaign Optimization</span></a></li>
+                <li><a href="#"><i class="fas fa-file-export"></i> <span class="nav-label">Export Dashboard</span></a></li>
+                <li><a href="#"><i class="fas fa-print"></i> <span class="nav-label">Print Dashboard</span></a></li>
+                <li><a href="#"><i class="fas fa-question-circle"></i> <span class="nav-label">Support</span></a></li>
+                <li><a href="{{url_for('admin.Index')}}"><i class="fas fa-question-circle"></i> <span class="nav-label">Admin</span></a></li>
+            </ul>
+        </div>
+    
+    <div class="main-content">
+        <div class="container-fluid">
+    <!-- Page Content -->
+      {%block content%}
+      {%endblock%}
+      {% block footer %}
+<!--
+        <footer class="footer">
+          <div class="container">
+            <span class="text-muted">Place sticky footer content here.</span>
+          </div>
+        </footer>
+      -->  
+        {%endblock%} 
+        </div>
+     </div>
+</div>   
+    
+
+  
+  </body>
+</html>
