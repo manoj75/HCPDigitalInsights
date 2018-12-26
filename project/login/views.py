@@ -2,7 +2,7 @@ import os
 from flask import Blueprint,render_template, redirect,url_for,request,flash
 from project.users.forms import UserForm
 from project.models import *
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import  generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from project.login.forms import LoginForm
 from project import app

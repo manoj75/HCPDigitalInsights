@@ -2,12 +2,12 @@ import json
 import requests
 import adal
 import re
-#from flask_sendgrid import SendGrid
-import sendgrid
-from sendgrid.helpers import mail
-
 import os
+import string
+import sendgrid
+from random import *
 from project import db,app
+from sendgrid.helpers import mail
 from flask import Blueprint,render_template, redirect,url_for,request,flash
 from project.models import User ,Profession, Customer,Campaign 
 from project.admin.forms import AddNewUserForm,NewCustomerForm,NewCampaignForm
@@ -29,17 +29,29 @@ SENDGRID_SENDER = os.environ['SENDGRID_SENDER']
 #mail = SendGrid(app)
 
  
-def sendGridEmail():
-    to = "manoj75@gmail.com"
+def sendGridEmail(to,emailType,userid,password):
+    #to = "manoj75@gmail.com"
     #if not to:
         #return ('Please provide an email address in the "to" query string '
         #        'parameter.'), 400
     sg = sendgrid.SendGridAPIClient(apikey=SENDGRID_API_KEY)
     to_email = mail.Email(to)
     from_email = mail.Email(SENDGRID_SENDER)
-    subject = 'This is a test email'
-    content = mail.Content('text/plain', 'Example message.')
-    message = mail.Mail(from_email, subject, to_email, content)
+    content=""
+    if emailType=="newuser":
+        subject = 'Your HCPDigital Insights account'
+        content = 'userId:'     +   userid+'\n'  
+        content = content+'Password:'   +   password+'\n'
+        content = content+'url:https://hcpdigitalinsights.azurewebsites.net'              
+         
+        body = mail.Content('text/plain',content)
+    else:
+        subject = 'Password reset'
+        content = content+'userId:'     +   userid+'\n'  
+        content = content+'Password:'   +   password+'\n'
+        content = content+'url:https://hcpdigitalinsights.azurewebsites.net'              
+        
+    message = mail.Mail(from_email, subject, to_email, body)
     response = sg.client.mail.send.post(request_body=message.get())
     print(response.status_code)
     print(response._body)
@@ -52,7 +64,6 @@ def sendGridEmail():
 @admin_blueprint.route("/")
 @login_required
 def Index():
-    sendGridEmail()
     return render_template('admin/index.html')
 
 @admin_blueprint.route("/newcustomer", methods=['GET', 'POST'])
@@ -87,20 +98,35 @@ def AddNewUser():
     if request.method=="POST":
         print(form.validate_on_submit())
     if form.validate_on_submit() :
-        # code to process form
-        #print("Validated")
-        #hashed_password = generate_password_hash(form.password.data, method='sha256')
-        hashed_password = generate_password_hash("123", method='sha256')
-        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password,customerid=form.customer.data,firstname=form.firstname.data,lastname=form.lastname.data)
+        username        =   form.username.data
+        email           =   form.email.data
+        password        =   generateRandomPwd()
+        customerid      =   form.customer.data
+        firstname       =   form.firstname.data
+        lastname        =   form.lastname.data
+        isadmin         =   form.isAdmin.data    
+        print(isadmin)
+        hashed_password =   generate_password_hash(password, method='sha256')
+        new_user = User(username=username, email=email, password=hashed_password,customerid=customerid,firstname=firstname,lastname=lastname,isAdmin=isadmin)
         print(new_user)
         db.session.add(new_user)
         db.session.commit()
+        sendGridEmail(email,"newuser",username,password)
         return render_template('admin/AddNewUser.html',newUserForm=form,success=True)
     else:
-        print("1111="+form.customer.data)
         print(form.errors)
     return render_template('admin/AddNewUser.html',newUserForm=form)
         
+
+
+
+def generateRandomPwd():
+    min_char = 8
+    max_char = 12
+    allchar = string.ascii_letters + string.punctuation + string.digits
+    password = "".join(choice(allchar) for x in range(randint(min_char, max_char)))
+    print ("This is your password : ",password)
+    return password
 
 @admin_blueprint.route("/newcampaign", methods=['GET', 'POST'])
 @login_required
