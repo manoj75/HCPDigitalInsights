@@ -14,7 +14,10 @@ class NewCampaignForm(FlaskForm):
     name        =   StringField('campaignname',validators=[InputRequired(), Length(max=80)],render_kw={ "class":"form-control", "id":"inputCampaignName", "placeholder":"Campaign Name"})
     customer    =   SelectField('customer',coerce =int, render_kw={ "class":"form-control", "id":"inputCustomer"})
 
-
 class NewCustomerForm(FlaskForm):
-    customername    =   StringField('customername',validators=[InputRequired()],render_kw={"class":"form-control", "id":"inputCustomername", "placeholder":"Customer Name"})
+    customername=   StringField('customername',validators=[InputRequired()],render_kw={"class":"form-control", "id":"inputCustomername", "placeholder":"Customer Name"})
+
+class PasswordResetForm(FlaskForm):
+    customer    =   SelectField('customer',coerce =int, render_kw={ "class":"form-control", "id":"inputCustomer"})
+    user        =   SelectField('campaignname',coerce =int,render_kw={ "class":"form-control", "id":"inputuserName"})
     

@@ -1,14 +1,21 @@
 import os
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_modus import Modus
 from flask_migrate import Migrate
 #import pyodbc
 import urllib.parse 
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import logging
+from logging.handlers import RotatingFileHandler
 
 app = Flask(__name__)
 modus = Modus(app)
+logHandler = RotatingFileHandler('info.log', maxBytes=1000, backupCount=1)
+logHandler.setLevel(logging.INFO)
+app.logger.setLevel(logging.INFO)
+app.logger.addHandler(logHandler)  
+
 DBServer   = os.environ['DBServer']
 DataBase    = os.environ['DataBase']
 DBUserID    = os.environ['DBUserID']
@@ -47,19 +54,23 @@ app.register_blueprint(dashboard_blueprint, url_prefix='/dashboard')
 app.register_blueprint(login_blueprint, url_prefix='/login')
 app.register_blueprint(admin_blueprint,url_prefix='/admin')
 
-#@app.context_processor
-#def filters():
+@app.context_processor
+def filters():
 #    professions=Profession.query.all()
 #    specialtyGroups=SpecialtyGroup.query.all()
 #    geoRegions=GeoRegions.query.all()
 #    Segments=Segment.query.all()
-#    print("--------------------------")
-#    print(current_user)
-#    customerName=Customer.query.get(current_user.customerid).name
-#    print("Customer Name="+customerName)
-#    print("--------------------------")
-#    return dict(customer_name=customerName,segments=Segments,professions=professions,specialtyGroups=specialtyGroups,geoRegions=geoRegions)
+    print("--------------------------")
+    print(current_user.is_authenticated)
+    if(current_user.is_authenticated):
+        customerName=Customer.query.get(current_user.customerid).name
+    else:
+        customerName=""
+    print("Customer Name="+customerName)
+    print("--------------------------")
+    return dict(customer_name=customerName)
 
 @app.route('/')
 def root():
-    return "HELLO BLUEPRINTS!"
+    #return "HELLO BLUEPRINTS!"
+    return redirect(url_for('login.login'))

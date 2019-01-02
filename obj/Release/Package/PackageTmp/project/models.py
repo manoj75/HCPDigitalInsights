@@ -9,18 +9,18 @@ class User(UserMixin,db.Model):
     email       =   db.Column(db.String(50), unique=True)
     password    =   db.Column(db.String(80))
     first_name  =   db.Column(db.String(80))
-    last_name  =   db.Column(db.String(80))
+    last_name   =   db.Column(db.String(80))
     customerid  =   db.Column(db.Integer)
+    isAdmin     =   db.Column(db.Integer)
 
-    #customer    =   db.relationship("Customer")
-
-    def __init__(self, username, email,password,customerid,firstname,lastname):
-        self.username = username
-        self.email = email
-        self.password=password
-        self.first_name=firstname
-        self.last_name=lastname
-        self.customerid=customerid
+    def __init__(self, username, email,password,customerid,firstname,lastname,isAdmin):
+        self.username   =   username
+        self.email      =   email
+        self.password   =   password
+        self.first_name =   firstname
+        self.last_name  =   lastname
+        self.customerid =   customerid
+        self.isAdmin    =   isAdmin
 
 class Customer(db.Model):
     __tablename__ = 'Customers'
