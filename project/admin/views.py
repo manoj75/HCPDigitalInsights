@@ -7,8 +7,9 @@ import string
 import sendgrid
 from random import *
 from project import db,app
+from sqlalchemy import or_
 from sendgrid.helpers import mail
-from flask import Blueprint,render_template, redirect,url_for,request,flash
+from flask import Blueprint,render_template, redirect,url_for,request,flash,jsonify
 from project.models import User ,Profession, Customer,Campaign 
 from project.admin.forms import PasswordResetForm,AddNewUserForm,NewCustomerForm,NewCampaignForm
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -63,13 +64,13 @@ def AddNewCustomer():
         return render_template('admin/AddNewCustomer.html',newCustomerForm=form)
     else:
         if form.validate_on_submit() :
-            exists = db.session.query(Customer.id).filter_by(name=form.customername.data).first() is not None
+            exists = db.session.query(Customer.id).filter((Customer.salesforceID==form.salesForceID.data)|(Customer.name==form.customername.data)).first() is not None
             print("exists="+str(exists))
             if(exists):
-                flash("Customer already exists!")
+                flash("Customer and/or Salesforce ID already exists!")
                 return render_template('admin/AddNewCustomer.html',newCustomerForm=form,success=False,error=True)
             else:    
-                new_customer = Customer(name=form.customername.data)
+                new_customer = Customer(name=form.customername.data,salesforceID=form.salesForceID.data)
                 print(new_customer)
                 db.session.add(new_customer)
                 db.session.commit()
@@ -77,6 +78,14 @@ def AddNewCustomer():
         else:
             print(form.errors)
         return render_template('admin/AddNewCustomer.html')
+
+
+@admin_blueprint.route("/getusers/<customerid>", methods=['GET', 'POST'])
+@login_required
+def GetUsers(customerid):
+    Users = db.session.query().filter((User.customerid==customerid)).all()
+    print(Users)
+    return jsonify(Users)
 
 @admin_blueprint.route("/newuser", methods=['GET', 'POST'])
 @login_required
@@ -96,18 +105,19 @@ def AddNewUser():
         customerid      =   form.customer.data
         firstname       =   form.firstname.data
         lastname        =   form.lastname.data
-        isadmin         =   form.isAdmin.data    
+        isadmin         =   form.isAdmin.data 
+        salesForceID    =   form.salesForceID.data
         print(isadmin)
-        exists = db.session.query(User.id).filter_by(username=username).first() is not None
+        exists = db.session.query(User.id).filter((User.salesForceID==salesForceID)|(User.username==username)).first() is not None
         print("exists="+str(exists))
         if(exists):
             blnError=True
             blnSuccess=False
-            flash("User already exists!")
+            flash("Username and/or SalesForce ID already exists!")
             #return render_template('admin/AddNewCampaign.html',newCampaignForm=form,success=False,error=True)
         else:
             hashed_password =   generate_password_hash(password, method='sha256')
-            new_user = User(username=username, email=email, password=hashed_password,customerid=customerid,firstname=firstname,lastname=lastname,isAdmin=isadmin)
+            new_user = User(username=username, email=email, password=hashed_password,customerid=customerid,firstname=firstname,lastname=lastname,isAdmin=isadmin,salesForceID=salesForceID)
             print(new_user)
             db.session.add(new_user)
             db.session.commit()

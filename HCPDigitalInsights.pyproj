@@ -94,10 +94,7 @@ SENDGRID_SENDER=azure_802dceae94bd02be9b7f4565355779d1@azure.com</PythonDebugWeb
     <Folder Include="project\users\__pycache__\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="HCPDigitalInsights - FTP.pubxml" />
     <None Include="HCPDigitalInsights - Web Deploy.pubxml" />
-    <None Include="HCPDigitalInsights - FTP1.pubxml" />
-    <None Include="HCPDigitalInsights - Web Deploy1.pubxml" />
     <Content Include="project\admin\templates\admin\AddNewCampaign.html" />
     <Content Include="project\admin\templates\admin\AddNewCustomer.html" />
     <Content Include="project\admin\templates\admin\AddNewUser.html" />

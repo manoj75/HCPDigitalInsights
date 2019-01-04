@@ -214,7 +214,7 @@ a.navbar-brand {
 	padding: 0 30px;
 	background: #84be13;
 	line-height: 80px;
-	text-transform: uppercase;
+	/*text-transform: uppercase;*/
 }
 /* -- SIDEBAR -- */
 
