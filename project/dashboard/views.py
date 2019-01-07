@@ -49,9 +49,11 @@ def ShowCampaign(id):
     response=requests.get(url, headers=headers)
     reportId=response.json()["value"][0]['id']
     reportUrl=response.json()["value"][0]["webUrl"]+"/GenerateToken"
+    print(response.json())
     #reportUrl="https://api.powerbi.com/v1.0/myorg/reports/"+response.json()["value"][0]['id']+"/GenerateToken"
     reportId="f01e98f3-abb9-4f51-bca3-a9eb419ee97e"
     reportId="187ffc03-1c8e-4cb8-a19c-d182c2b01b16"
+    reportId="07ca665c-974a-4eca-a85e-64ba41c98a2b"
     reportUrl="https://api.powerbi.com/v1.0/myorg/groups/42b9d168-fefb-4b3c-aa2d-af24fb08f4d8/reports/"+reportId+"/GenerateToken"
     data1= {
             'allowSaveAs'   : 'false',
@@ -60,12 +62,13 @@ def ShowCampaign(id):
                                 {
                                     "username":campaignId,
                                     "roles":["Campaign"],
-                                    "datasets":["80529fbe-4cae-49aa-a27c-2106c3d8aad7"]
+                                    "datasets":["165a34d6-42a9-49fc-b6d4-50be5bac0f40"]
                                 }
                               ]
             }
 
     responseEmbedToken=requests.post(reportUrl,data=json.dumps(data1),headers=headers)
+    print(responseEmbedToken.text)
     embedurl="https://app.powerbi.com/reportEmbed?reportId="+reportId+"&groupId=42b9d168-fefb-4b3c-aa2d-af24fb08f4d8"
     configObj={'token':responseEmbedToken.json()["token"],'embedurl':embedurl,'reportid':reportId}
     professions=Profession.query.all()

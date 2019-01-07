@@ -12,8 +12,9 @@ class AddNewUserForm(FlaskForm):
     salesForceID    =   StringField('salesforceid',validators=[InputRequired()],render_kw={"class":"form-control", "id":"inputsalesforceid", "placeholder":"Salesforce ID"})
     
 class NewCampaignForm(FlaskForm):
-    name        =   StringField('campaignname',validators=[InputRequired(), Length(max=80)],render_kw={ "class":"form-control", "id":"inputCampaignName", "placeholder":"Campaign Name"})
-    customer    =   SelectField('customer',coerce =int, render_kw={ "class":"form-control", "id":"inputCustomer"})
+    name                =   StringField('campaignname',validators=[InputRequired(), Length(max=80)],render_kw={ "class":"form-control", "id":"inputCampaignName", "placeholder":"Campaign Name"})
+    customer            =   SelectField('customer',coerce =int, render_kw={ "class":"form-control", "id":"inputCustomer"})
+    powerBIReportID     =   SelectField('powerbireportid',render_kw={"class":"form-control", "id":"inputpowerbireportid", "placeholder":"Power BI Report ID"})
 
 class NewCustomerForm(FlaskForm):
     customername=   StringField('customername',validators=[InputRequired()],render_kw={"class":"form-control", "id":"inputCustomername", "placeholder":"Customer Name"})

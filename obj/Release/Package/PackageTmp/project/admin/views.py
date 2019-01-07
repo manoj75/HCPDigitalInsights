@@ -157,7 +157,7 @@ def AddNewCampaign():
             flash("Campaign already exists!")
             return render_template('admin/AddNewCampaign.html',newCampaignForm=form,success=False,error=True)
         else:
-            new_campaign = Campaign(name=form.name.data, customerid=form.customer.data)
+            new_campaign = Campaign(name=form.name.data, customerid=form.customer.data,powerbireportid="1")
             print(new_campaign)
             db.session.add(new_campaign)
             db.session.commit()

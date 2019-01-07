@@ -401,6 +401,7 @@ a.navbar-brand {
 	background: #e9edf1 !important;
  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#e9edf1', GradientType=0 );
 	height: calc(100vh - 80px);
+	overflow-y: scroll;
 }
 .main-content {
 	position: relative;
@@ -530,6 +531,20 @@ body#login {
 	opacity:.7;
 }
 
+.filterRow
+{
+  display: table-row;
+} 
+.filterColumn
+{
+  display: table-cell;
+  padding-bottom: 10px;
+  padding-right: 10px;
+  font-weight: bold;
+  float:left;
+}
+
+
 /* -- RESPONSIVE -- */
 @media (max-width: 992px) {
 .header .float-left {
@@ -564,6 +579,7 @@ body#login {
 	color: #fff !important;
 }
 }
+
 
 @media (min-width: 992px) {
 .navbar-toggleable-md .navbar-collapse {

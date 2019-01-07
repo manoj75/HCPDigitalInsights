@@ -84,9 +84,11 @@ class Segment(db.Model):
 
 class Campaign(db.Model):
     __tablename__ = 'Campaigns'
-    id          = db.Column(db.Integer, primary_key=True)
-    name        = db.Column(db.Text)
-    customerId  = db.Column(db.Integer)
-    def __init__(self, name, customerid):
+    id              = db.Column(db.Integer, primary_key=True)
+    name            = db.Column(db.Text)
+    customerId      = db.Column(db.Integer)
+    PowerBIReportID = db.Column(db.Text)
+    def __init__(self, name, customerid,powerbireportid):
         self.name       = name
         self.customerId = customerid
+        this.PowerBIReportID=powerbireportid

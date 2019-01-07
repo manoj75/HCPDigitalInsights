@@ -1,55 +1,63 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<main class="col-sm-9 offset-sm-3 col-md-10 offset-md-2 pt-3">
-<h1>Professional Insights</h1>
+<!--<main class="col-sm-9 offset-sm-12 col-md-10 offset-md-12 pt-3">-->
+<main>
+    <DashboardRow>
+        <DashboardColumn>Select a Dashboard:</DashboardColumn>
+        <DashboardColumn>
+            <select id="ddPages" style="width:220px" data-placeholder="Choose a Page..." class="chosen-select">
+            </select>
+        </DashboardColumn>
+    </DashboardRow>
+    <h1><div id="PageTitle"></div></h1>
     <DashboardTable>
         <DashboardRow>
             <DashboardColumn>
                 <div style="padding:8px" class="filterRow">
-                <div class="filterColumn">    
-                    <div>
-                        Segment:
-                    </div>
-                    <div>    
-                        <select id="ddSegment" data-placeholder="Choose a segment..." multiple class="chosen-select">
-                            {% for segment in segments %}
-                            <option value="{{ segment.id }}" >{{ segment.name}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>    
-                <div class="filterColumn">
-                    <div>Profession:</div>
-                    <div>
-                        <select id="ddProfession" data-placeholder="Choose a Profession..." multiple class="chosen-select">
-                            {% for profession in professions %}
-                            <option value="{{ profession.id }}" >{{ profession.name}}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="filterColumn">    
+                        <div>
+                            Segment:
+                        </div>
+                        <div>    
+                            <select id="ddSegment" data-placeholder="Choose a segment..." multiple class="chosen-select">
+                                {% for segment in segments %}
+                                <option value="{{ segment.id }}" >{{ segment.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>    
-                </div>
-                <div class="filterColumn">
-                    <div>Region:</div>
-                    <div>
-                        <select id="ddRegion" data-placeholder="Choose a Region..." multiple class="chosen-select">
-                                {% for region in geoRegions %}
-                            <option value="{{ region.id }}" >{{ region.name}}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="filterColumn">
+                        <div>Profession:</div>
+                        <div>
+                            <select id="ddProfession" data-placeholder="Choose a Profession..." multiple class="chosen-select">
+                                {% for profession in professions %}
+                                <option value="{{ profession.id }}" >{{ profession.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>    
+                    </div>
+                    <div class="filterColumn">
+                        <div>Region:</div>
+                        <div>
+                            <select id="ddRegion" data-placeholder="Choose a Region..." multiple class="chosen-select">
+                                    {% for region in geoRegions %}
+                                <option value="{{ region.id }}" >{{ region.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filterColumn">
+                        <div>Specialty:</div>
+                        <div>
+                            <select id="ddSpecialtyGroup" data-placeholder="Choose a Specialty..." multiple class="chosen-select">
+                                    {% for specialtyGroup in specialtyGroups %}
+                                <option value="{{ specialtyGroup.id }}" >{{ specialtyGroup.name}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>        
                     </div>
                 </div>
-                <div class="filterColumn">
-                    <div>Specialty:</div>
-                    <div>
-                        <select id="ddSpecialtyGroup" data-placeholder="Choose a Specialty..." multiple class="chosen-select">
-                                {% for specialtyGroup in specialtyGroups %}
-                            <option value="{{ specialtyGroup.id }}" >{{ specialtyGroup.name}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>        
-                </div>
-            </div>
             </DashboardColumn>
         </DashboardRow>
         <DashboardRow>
@@ -59,121 +67,121 @@
         </DashboardRow>
     </DashboardTable>
 </main>        
-
 <script>
-        $(document).ready(function() {
-
-          //console.log($('#ddSegment'));
-          //$('#ddSegment').select2();
-          $(".chosen-select").chosen({no_results_text: "Oops, nothing found!"}); 
-      });
-      $(document).ready(function() {
-      //$('.mdb-select').materialSelect();
-    });
+$(document).ready(function() 
+{
+    $(".chosen-select").chosen({no_results_text: "Oops, nothing found!"});
+    $("#ddPages").chosen({width: "95px"});  
+});
 
 var config = JSON.parse('{{ configObj|safe }}');  
 var reportid=config.reportid;
 var reporturl=config.embedurl;
 var token=config.token;
+window.onload = function () 
+{ 
+    var models = window['powerbi-client'].models;
+    var $reportContainer = $('#mainReportContainer');
 
-    window.onload = function () 
-    { 
-        //console.log('{{profession}}');
-        var models = window['powerbi-client'].models;
-        //console.log(models);
-        var $reportContainer = $('#mainReportContainer');
-        var Filter1 = {
-            $schema: "http://powerbi.com/product/schema#basic",
-            target: {
-                    table: "Audience",
-                    column: "MDG Region"
-            },
-            operator: "Is",
-            value:"North East",
-            
-            }
-
-        var embedConfiguration = {
-                    type: 'report',
-                    id: reportid,
-                    embedUrl: reporturl,
-                    tokenType: models.TokenType.Embed,
-                    accessToken: token,
-                    settings: 
-                    {
-                        filterPaneEnabled: true, //hide the filterPane so that your user can't change the filter to see more data, this is not a strong security, anyone who's familar with javascript can bypass it
-                        navContentPaneEnabled: false
-                    }
-                };
-                report= powerbi.embed($reportContainer.get(0), embedConfiguration);
-
-var filters=[];
-var SelectTexts=[];
-$('select').on('change', function() {
-  //alert( this.value );
-  var filter;
-  console.log("-------------------");  
-  var id; 
-  filters.length=0; 
-  $('select').each(function()
-  {
-    id=this.id;
-    values=$("#"+id).chosen().val();
-    if(values.length>0)
+    var embedConfiguration = 
+{
+    type: 'report',
+    id: reportid,
+    embedUrl: reporturl,
+    tokenType: models.TokenType.Embed,
+    accessToken: token,
+    settings: 
     {
-        textObjs=[];
-        console.log(values);
-        for(var val in values)
-        {
-            console.log("ivalue="+values[val]);
-            text=$("#"+id+" option[value='"+values[val]+"']").text();
-            textObjs.push(text);
-        }
-        console.log("text="+textObjs);
-        filter=getFilter(getColumnName(id),textObjs)
-        console.log(filter);
-        filters.push(filter);
-        
+        filterPaneEnabled: true, //hide the filterPane so that your user can't change the filter to see more data, this is not a strong security, anyone who's familar with javascript can bypass it
+        navContentPaneEnabled: false
     }
-    //SelectTexts.length=0;
-  })
-  console.log(filters);
-  console.log("-------------------");
-  var report = powerbi.embeds[0];
-  if (report) {
-                report.setFilters(filters);
-                /*report.getFilters()
-                .then(filters => {
-                    filters.push(basicFilter);
-                        console.log(filters); 
-                    report.setFilters(filters);
-                });*/
-
-                /*report.setFilters([basicFilter])
-                    .then(function (result) {
-                        console.log("2222");
-                        console.log(result);
-                    })
-                    .catch(function (errors) {
-                        console.log("11111");
-                        console.log(errors);
-                    });*/
+};
+    report= powerbi.embed($reportContainer.get(0), embedConfiguration);
+    report.on('loaded', function (event)
+{
+    var i=0;
+    //const page=null;
+    //console.log("report loaded");
+    report.getPages().then
+    (
+        function(pages)
+        {
+            //console.log('pages:',pages)
+            pages[0].setActive();
+            $("#PageTitle").text(pages[0].displayName);
+            pages.forEach(element => 
+            {
+                //console.log(element);
+                $("#ddPages").append("<option value="+element.name+">"+element.displayName+"</option>");
+            });
+            $("#ddPages").trigger("chosen:updated");
+        }
+    )
+})      
+    
+    var filters=[];
+    var SelectTexts=[];
+    $('select').on('change', function() 
+{
+    var dropDownId=this.id;
+    //console.log("dropDownId="+dropDownId);
+    var report = powerbi.embeds[0];
+    if(dropDownId!="ddPages")
+    {
+        var filter;
+        //console.log("-------------------");  
+        var ddFilterId; 
+        filters.length=0; 
+        $('select').each(function()
+        {
+            ddFilterId=this.id;
+            if(ddFilterId!="ddPages")
+            {
+                //console.log("ddFilterId="+ddFilterId);
+                values=$("#"+ddFilterId).chosen().val();
+                //console.log(values);
+                if(values.length>0)
+                {
+                    textObjs=[];
+                    for(var val in values)
+                    {
+                        //console.log("ivalue="+values[val]);
+                        //text=$("#"+id+" option[value='"+values[val]+"']").text();
+                        text=$("#"+dropDownId+" option[value='"+values[val]+"']").text();
+                        textObjs.push(text);
+                    }
+                    //console.log("text="+textObjs);
+                    //filter=getFilter(getColumnName(id),textObjs)
+                    filter=getFilter(getColumnName(dropDownId),textObjs)
+                    //console.log(filter);
+                    filters.push(filter);
+                }
+                //SelectTexts.length=0;
             }
+        })
+        //console.log(filters);
+        //console.log("-------------------");
+        if (report) 
+        {
+            report.setFilters(filters);
+        }
+    }
+    else
+    {
+        //console.log(report);
+        var pageName=$("#"+dropDownId).chosen().val();
+        var pageText=$("#"+dropDownId+" option[value='"+pageName+"']").text();
+        //console.log(pageName);
+        //console.log(pageText);
+        var reportPage=report.page(pageName);
+        //console.log(reportPage);
+        reportPage.setActive();
+        $("#PageTitle").text(pageText);
+    }
+}
+    );
 
-});
-
-/*report.on('loaded', event => {
-    console.log("report loaded");  
-    report.getFilters()
-        .then(filters => {
-          filters.push(basicFilter);
-          console.log(filters); 
-          report.setFilters(filters);
-        });
-    });
-
-*/
-var getColumnName=function(id,values)
+    var getColumnName=function(id,values)
 {
     var colName="";
     if (id=="ddSpecialtyGroup")
@@ -194,68 +202,23 @@ var getColumnName=function(id,values)
     }    
     return colName;
 }
-
-function getFilter(colName,colValues) {
-    var basicFilter = {
-                        $schema: "http://powerbi.com/product/schema#advanced",
-                        target: {
-                            table: "Audience",
-                            //column: "MDG COUNTY"
-                            column: colName
-                        },
-                        //logicalOperator:"Or",
-                        operator: "In",
-                        values:colValues,
-                        filterType: models.FilterType.basicFilter
-                    }
-        return basicFilter;            
-        }
-
-/*function filter(colName,values) {
-    const basicFilter = {
-                        $schema: "http://powerbi.com/product/schema#advanced",
-                        target: {
-                            table: "Audience_Dataset",
-                            //column: "MDG COUNTY"
-                            column: colName
-                        },
-                        //logicalOperator:"Or",
-                        conditions: [{
-                                        operator: "Is",
-                                        value: value
-                                    }],
-                        filterType: models.FilterType.AdvancedFilter
-                    }
-            var report = powerbi.embeds[0];
-            if (report) {
-                report.setFilters([basicFilter]);
-                *report.getFilters()
-                .then(filters => {
-                    filters.push(basicFilter);
-                        console.log(filters); 
-                    report.setFilters(filters);
-                });*
-
-                *report.setFilters([basicFilter])
-                    .then(function (result) {
-                        console.log("2222");
-                        console.log(result);
-                    })
-                    .catch(function (errors) {
-                        console.log("11111");
-                        console.log(errors);
-                    });*
-            }
-        }
-    */
-
-
-
+    function getFilter(colName,colValues) 
+{
+    var basicFilter =   {
+                            $schema: "http://powerbi.com/product/schema#advanced",
+                            target: 
+                            {
+                                table: "Audience",
+                                column: colName
+                            },
+                            operator: "In",
+                            values:colValues,
+                            filterType: models.FilterType.basicFilter
+                        }
+    return basicFilter;            
 }
-
-
+}
 </script>
-  {%endblock%}
-
+{%endblock%}
 
  
