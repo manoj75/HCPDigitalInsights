@@ -18,30 +18,12 @@
     <Name>HCPDigitalInsights</Name>
     <RootNamespace>HCPDigitalInsights</RootNamespace>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
-    <Environment>DBServer=hcpdigitalinsights.database.windows.net
-DataBase=HCPDigitalInsights
-DBUserID=hcpdigital
-DBPassword=Hcp123digital
-PbiUserID=bill.reinstein@hcpdigitalinsights.com
-PbiPassword=Bilso1520
-SendGridKey=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
-SENDGRID_SENDER=azure_802dceae94bd02be9b7f4565355779d1@azure.com</Environment>
-    <PythonRunWebServerCommandEnvironment>DBServer=hcpdigitalinsights.database.windows.net
-DataBase=HCPDigitalInsights
-DBUserID=hcpdigital
-DBPassword=Hcp123digital
-PbiUserID=bill.reinstein@hcpdigitalinsights.com
-PbiPassword=Bilso1520
-SendGridKey=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
-SENDGRID_SENDER=azure_802dceae94bd02be9b7f4565355779d1@azure.com</PythonRunWebServerCommandEnvironment>
-    <PythonDebugWebServerCommandEnvironment>DBServer=hcpdigitalinsights.database.windows.net
-DataBase=HCPDigitalInsights
-DBUserID=hcpdigital
-DBPassword=Hcp123digital
-PbiUserID=bill.reinstein@hcpdigitalinsights.com
-PbiPassword=Bilso1520
-SendGridKey=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
-SENDGRID_SENDER=azure_802dceae94bd02be9b7f4565355779d1@azure.com</PythonDebugWebServerCommandEnvironment>
+    <Environment>
+    </Environment>
+    <PythonRunWebServerCommandEnvironment>
+    </PythonRunWebServerCommandEnvironment>
+    <PythonDebugWebServerCommandEnvironment>
+    </PythonDebugWebServerCommandEnvironment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
