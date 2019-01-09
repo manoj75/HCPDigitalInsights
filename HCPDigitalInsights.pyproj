@@ -96,8 +96,10 @@
     <Content Include="project\login\__pycache__\forms.cpython-37.pyc" />
     <Content Include="project\login\__pycache__\views.cpython-37.pyc" />
     <Content Include="project\login\__pycache__\__init__.cpython-37.pyc" />
+    <Content Include="project\static\css\bootstrap-datetimepicker.css" />
     <Content Include="project\static\css\bootstrap.min.1.css" />
     <Content Include="project\static\css\bootstrap.min.css" />
+    <Content Include="project\static\css\chosen-sprite.png" />
     <Content Include="project\static\css\chosen.css" />
     <Content Include="project\static\css\dashboard.css" />
     <Content Include="project\static\css\fontawesome.min.css" />
@@ -153,6 +155,7 @@
     <Content Include="project\static\js\jquery.min.js" />
     <Content Include="project\static\js\keen-analytics.js" />
     <Content Include="project\static\js\mdg.js" />
+    <Content Include="project\static\js\moment-with-locales.js" />
     <Content Include="project\static\js\powerbi.min.js" />
     <Content Include="project\static\js\reductio.min.js" />
     <Content Include="project\static\js\starter-kit.js" />

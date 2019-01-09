@@ -15,12 +15,18 @@
         <DashboardRow>
             <DashboardColumn>
                 <div style="padding:8px" class="filterRow">
+                    <div class="filterColumn">
+                            Start Date: <input id="startDate" width="190" class="fakefilterClass"/>
+                    </div>
+                    <div class="filterColumn">
+                            End Date: <input id="endDate" width="190" class="fakefilterClass"/>
+                    </div>
                     <div class="filterColumn">    
                         <div>
                             Segment:
                         </div>
                         <div>    
-                            <select id="ddSegment" data-placeholder="Choose a segment..." multiple class="chosen-select">
+                            <select id="ddSegment" height="33px"  data-placeholder="Choose a segment..." multiple class="fakefilterClass chosen-select">
                                 {% for segment in segments %}
                                 <option value="{{ segment.id }}" >{{ segment.name}}</option>
                                 {% endfor %}
@@ -30,7 +36,7 @@
                     <div class="filterColumn">
                         <div>Profession:</div>
                         <div>
-                            <select id="ddProfession" data-placeholder="Choose a Profession..." multiple class="chosen-select">
+                            <select id="ddProfession" data-placeholder="Choose a Profession..." multiple class="fakefilterClass chosen-select">
                                 {% for profession in professions %}
                                 <option value="{{ profession.id }}" >{{ profession.name}}</option>
                                 {% endfor %}
@@ -40,7 +46,7 @@
                     <div class="filterColumn">
                         <div>Region:</div>
                         <div>
-                            <select id="ddRegion" data-placeholder="Choose a Region..." multiple class="chosen-select">
+                            <select id="ddRegion" data-placeholder="Choose a Region..." multiple class="fakefilterClass chosen-select">
                                     {% for region in geoRegions %}
                                 <option value="{{ region.id }}" >{{ region.name}}</option>
                                 {% endfor %}
@@ -50,7 +56,7 @@
                     <div class="filterColumn">
                         <div>Specialty:</div>
                         <div>
-                            <select id="ddSpecialtyGroup" data-placeholder="Choose a Specialty..." multiple class="chosen-select">
+                            <select id="ddSpecialtyGroup" data-placeholder="Choose a Specialty..." multiple class="fakefilterClass chosen-select">
                                     {% for specialtyGroup in specialtyGroups %}
                                 <option value="{{ specialtyGroup.id }}" >{{ specialtyGroup.name}}</option>
                                 {% endfor %}
@@ -67,10 +73,28 @@
         </DashboardRow>
     </DashboardTable>
 </main>        
-<script>
+    <script type="text/javascript">
+        var today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+        $('#startDate').datepicker({
+            uiLibrary: 'bootstrap4',
+            iconsLibrary: 'fontawesome',
+            //minDate: today,
+            maxDate: function () {
+                return $('#endDate').val();
+            }
+        });
+        $('#endDate').datepicker({
+            uiLibrary: 'bootstrap4',
+            iconsLibrary: 'fontawesome',
+            minDate: function () {
+                return $('#startDate').val();
+            }
+        });
+
+
 $(document).ready(function() 
 {
-    $(".chosen-select").chosen({no_results_text: "Oops, nothing found!"});
+    $(".chosen-select").chosen({height:"33px",no_results_text: "Oops, nothing found!"});
     $("#ddPages").chosen({width: "95px"});  
 });
 
@@ -81,65 +105,99 @@ var token=config.token;
 window.onload = function () 
 { 
     var models = window['powerbi-client'].models;
+    console.log("lllllllll");
+    console.log(models.FilterType.Advanced);
+    console.log("lllllllll");
     var $reportContainer = $('#mainReportContainer');
 
     var embedConfiguration = 
-{
-    type: 'report',
-    id: reportid,
-    embedUrl: reporturl,
-    tokenType: models.TokenType.Embed,
-    accessToken: token,
-    settings: 
     {
-        filterPaneEnabled: true, //hide the filterPane so that your user can't change the filter to see more data, this is not a strong security, anyone who's familar with javascript can bypass it
-        navContentPaneEnabled: false
-    }
-};
+        type: 'report',
+        id: reportid,
+        embedUrl: reporturl,
+        tokenType: models.TokenType.Embed,
+        accessToken: token,
+        settings: 
+        {
+            filterPaneEnabled: true, //hide the filterPane so that your user can't change the filter to see more data, this is not a strong security, anyone who's familar with javascript can bypass it
+            navContentPaneEnabled: false,
+            background: models.BackgroundType.Transparent
+        }
+    };
     report= powerbi.embed($reportContainer.get(0), embedConfiguration);
     report.on('loaded', function (event)
-{
-    var i=0;
-    //const page=null;
-    //console.log("report loaded");
-    report.getPages().then
-    (
-        function(pages)
-        {
-            //console.log('pages:',pages)
-            pages[0].setActive();
-            $("#PageTitle").text(pages[0].displayName);
-            pages.forEach(element => 
+    {
+        var i=0;
+        //const page=null;
+        //console.log("report loaded");
+        report.getPages().then
+        (
+            function(pages)
             {
-                //console.log(element);
-                $("#ddPages").append("<option value="+element.name+">"+element.displayName+"</option>");
-            });
-            $("#ddPages").trigger("chosen:updated");
-        }
-    )
-})      
+                //console.log('pages:',pages)
+                pages[0].setActive();
+                $("#PageTitle").text(pages[0].displayName);
+                pages.forEach(element => 
+                {
+                    //console.log(element);
+                    $("#ddPages").append("<option value="+element.name+">"+element.displayName+"</option>");
+                });
+                $("#ddPages").trigger("chosen:updated");
+            }
+        )
+    })      
     
     var filters=[];
     var SelectTexts=[];
-    $('select').on('change', function() 
-{
-    var dropDownId=this.id;
-    //console.log("dropDownId="+dropDownId);
-    var report = powerbi.embeds[0];
-    if(dropDownId!="ddPages")
+    $('#ddPages').on('change',function()
     {
-        var filter;
-        //console.log("-------------------");  
-        var ddFilterId; 
+    console.log(this.id);
+    dropDownId=this.id;
+    //console.log(report);
+    var pageName=$("#"+dropDownId).chosen().val();
+    var pageText=$("#"+dropDownId+" option[value='"+pageName+"']").text();
+    //console.log(pageName);
+    //console.log(pageText);
+    var report = powerbi.embeds[0];
+    var reportPage=report.page(pageName);
+    //console.log(reportPage);
+    reportPage.setActive();
+    $("#PageTitle").text(pageText);
+    })
+
+    //$('select').on('change', function()
+    $('.fakefilterClass').on('change', function()
+    {
+        var dropDownId=this.id;
+        //console.log("dropDownId="+dropDownId);
+        var report = powerbi.embeds[0];
+        var objFilterId; 
         filters.length=0; 
-        $('select').each(function()
+        //$('select').each(function()
+        $('.fakefilterClass').each(function()
         {
-            ddFilterId=this.id;
-            if(ddFilterId!="ddPages")
+            var filter;
+            //console.log("objFilterId="+objFilterId);
+            //console.log(this.type);
+            objFilterId=this.id;
+            if(this.type=="text") //Date column
             {
-                //console.log("ddFilterId="+ddFilterId);
-                values=$("#"+ddFilterId).chosen().val();
-                //console.log(values);
+                startDate=$("#startDate").val();
+                endDate=$("#endDate").val();
+                console.log("startDate="+startDate);
+                console.log("endDate="+endDate);
+                if(endDate!="" || startDate!="")
+                {
+                    filter=getDateFilter(getColumnName(objFilterId),startDate,endDate)
+                }
+                console.log(filter);
+            }   
+            else//Dropdown values
+            {
+                values=$("#"+objFilterId).chosen().val();
+                console.log("1111111111111111111");
+                console.log(values);
+                console.log("1111111111111111111");
                 if(values.length>0)
                 {
                     textObjs=[];
@@ -147,76 +205,142 @@ window.onload = function ()
                     {
                         //console.log("ivalue="+values[val]);
                         //text=$("#"+id+" option[value='"+values[val]+"']").text();
-                        text=$("#"+dropDownId+" option[value='"+values[val]+"']").text();
+                        text=$("#"+objFilterId+" option[value='"+values[val]+"']").text();
                         textObjs.push(text);
                     }
                     //console.log("text="+textObjs);
                     //filter=getFilter(getColumnName(id),textObjs)
-                    filter=getFilter(getColumnName(dropDownId),textObjs)
-                    //console.log(filter);
-                    filters.push(filter);
+                    filter=getFilter(getColumnName(objFilterId),textObjs)
+                    console.log("==================================");
+                    console.log(filter);
+                    console.log("==================================");
                 }
                 //SelectTexts.length=0;
             }
+            if(filter)
+            {
+                filters.push(filter);
+            }
         })
-        //console.log(filters);
-        //console.log("-------------------");
+        console.log("++++++++++++++++++++++++++++++");
+        console.log(filters);
+        console.log("++++++++++++++++++++++++++++++");
+        console.log(report)
         if (report) 
         {
             report.setFilters(filters);
         }
     }
-    else
-    {
-        //console.log(report);
-        var pageName=$("#"+dropDownId).chosen().val();
-        var pageText=$("#"+dropDownId+" option[value='"+pageName+"']").text();
-        //console.log(pageName);
-        //console.log(pageText);
-        var reportPage=report.page(pageName);
-        //console.log(reportPage);
-        reportPage.setActive();
-        $("#PageTitle").text(pageText);
-    }
-}
     );
 
-    var getColumnName=function(id,values)
-{
-    var colName="";
-    if (id=="ddSpecialtyGroup")
+    //var getColumnName=function(id,values)
+    var getColumnName=function(id)
     {
-        colName="MDG SPECIALTY GROUP"
+        var colName="";
+        if (id=="ddSpecialtyGroup")
+        {
+            colName="MDG SPECIALTY GROUP"
+        }
+        if (id=="ddRegion")
+        {
+            colName="MDG Region"
+        }
+        if (id=="ddProfession")
+        {
+            colName="MDG PROFESSION"
+        }    
+        if (id=="ddSegment")
+        {
+            colName="Segment"
+        }
+        if(id=="startDate" || id=="endDate")
+        {
+            colName="impression_datestamp"
+        }    
+        return colName;
     }
-    if (id=="ddRegion")
+    function getDateFilter(colName,startDate,endDate) 
     {
-        colName="MDG Region"
-    }
-    if (id=="ddProfession")
-    {
-        colName="MDG PROFESSION"
-    }    
-    if (id=="ddSegment")
-    {
-        colName="Segment"
-    }    
-    return colName;
-}
-    function getFilter(colName,colValues) 
-{
-    var basicFilter =   {
-                            $schema: "http://powerbi.com/product/schema#advanced",
-                            target: 
+        if(startDate!="" && endDate=="")
+        {
+            var basicFilter =   
                             {
-                                table: "Audience",
-                                column: colName
-                            },
-                            operator: "In",
-                            values:colValues,
-                            filterType: models.FilterType.basicFilter
-                        }
-    return basicFilter;            
-}
+                                $schema: "http://powerbi.com/product/schema#advanced",
+                                target: 
+                                {
+                                    table: "Exposure",
+                                    column: colName
+                                },
+                                conditions:[
+                                    {
+                                        operator    :   "GreaterThanOrEqual",
+                                        values      :   startDate
+                                    }],
+                                filterType: models.FilterType.Advanced
+                            }
+        }
+        if(startDate=="" && endDate!="")
+        {
+            var basicFilter =   
+                            {
+                                $schema: "http://powerbi.com/product/schema#advanced",
+                                target: 
+                                {
+                                    table: "Exposure",
+                                    column: colName
+                                },
+                                conditions:[
+                                    {
+                                        operator    :   "LessThanOrEqual",
+                                        values      :   endDate
+                                    }],
+                                filterType: models.FilterType.Advanced
+                            }
+        }
+        if(startDate!="" && endDate!="")
+        {
+            var basicFilter =   
+                            {
+                                $schema: "http://powerbi.com/product/schema#advanced",
+                                target: 
+                                {
+                                    table: "Exposure",
+                                    column: colName
+                                },
+                                logicalOperator:"And",
+                                conditions:
+                                    [
+                                        {
+                                            operator    :   "GreaterThanOrEqual",
+                                            values      :   startDate
+                                        },
+                                        {
+                                            operator    :   "LessThanOrEqual",
+                                            values      :   endDate
+                                        }
+                                    ],
+                                filterType: models.FilterType.Advanced
+                            }
+        }
+
+        return basicFilter;            
+    }
+
+    function getFilter(colName,colValues) 
+    {
+        var basicFilter =   {
+                                $schema: "http://powerbi.com/product/schema#advanced",
+                                target: 
+                                {
+                                    table: "Audience",
+                                    column: colName
+                                },
+                                operator: "In",
+                                values:colValues,
+                                filterType: models.FilterType.Basic
+                            }
+        return basicFilter;            
+    }
 }
 </script>
 {%endblock%}
