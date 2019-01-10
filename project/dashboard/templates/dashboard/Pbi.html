@@ -10,7 +10,7 @@
             </select>
         </DashboardColumn>
     </DashboardRow>
-    <h1><div id="PageTitle"></div></h1>
+    <h1><div id="PageTitle" style="height:50px"></div></h1>
     <DashboardTable>
         <DashboardRow>
             <DashboardColumn>
@@ -68,6 +68,11 @@
         </DashboardRow>
         <DashboardRow>
             <DashboardColumn>
+                    <div style="text-align: right;padding-right: 10px;height:30px;">
+                        <a style="display:none" id="printIcon" onclick="printPage();">
+                                <button style="font-size:14px;cursor:pointer;">Print <i class="fa fa-print"></i></button>
+                        </a>
+                    </div>
                 <div class="report-container" id="mainReportContainer"></div>
             </DashboardColumn>
         </DashboardRow>
@@ -96,7 +101,9 @@ $(document).ready(function()
 {
     $(".chosen-select").chosen({height:"33px",no_results_text: "Oops, nothing found!"});
     $("#ddPages").chosen({width: "95px"});  
-});
+    console.log($("#ddSpecialtyGroup_chosen"));
+    $("#ddSpecialtyGroup_chosen").css('width', '95px');
+})
 
 var config = JSON.parse('{{ configObj|safe }}');  
 var reportid=config.reportid;
@@ -130,6 +137,7 @@ window.onload = function ()
         var i=0;
         //const page=null;
         //console.log("report loaded");
+        $("#printIcon").show();
         report.getPages().then
         (
             function(pages)
@@ -177,6 +185,7 @@ window.onload = function ()
         $('.fakefilterClass').each(function()
         {
             var filter;
+            var dateValue;
             //console.log("objFilterId="+objFilterId);
             //console.log(this.type);
             objFilterId=this.id;
@@ -184,20 +193,21 @@ window.onload = function ()
             {
                 startDate=$("#startDate").val();
                 endDate=$("#endDate").val();
-                console.log("startDate="+startDate);
-                console.log("endDate="+endDate);
+                //console.log("startDate="+startDate);
+                //console.log("endDate="+endDate);
+                dateValue=$("#"+objFilterId).val();
                 if(endDate!="" || startDate!="")
                 {
-                    filter=getDateFilter(getColumnName(objFilterId),startDate,endDate)
+                        filter=getDateFilter(getColumnName(objFilterId),startDate,endDate)
                 }
-                console.log(filter);
+                //console.log(filter);
             }   
             else//Dropdown values
             {
                 values=$("#"+objFilterId).chosen().val();
-                console.log("1111111111111111111");
-                console.log(values);
-                console.log("1111111111111111111");
+                //console.log("1111111111111111111");
+                //console.log(values);
+                //console.log("1111111111111111111");
                 if(values.length>0)
                 {
                     textObjs=[];
@@ -211,9 +221,9 @@ window.onload = function ()
                     //console.log("text="+textObjs);
                     //filter=getFilter(getColumnName(id),textObjs)
                     filter=getFilter(getColumnName(objFilterId),textObjs)
-                    console.log("==================================");
-                    console.log(filter);
-                    console.log("==================================");
+                    //console.log("==================================");
+                    //console.log(filter);
+                    //console.log("==================================");
                 }
                 //SelectTexts.length=0;
             }
@@ -222,13 +232,19 @@ window.onload = function ()
                 filters.push(filter);
             }
         })
-        console.log("++++++++++++++++++++++++++++++");
-        console.log(filters);
-        console.log("++++++++++++++++++++++++++++++");
-        console.log(report)
+        //console.log("++++++++++++++++++++++++++++++");
+        //console.log(filters);
+        //console.log("++++++++++++++++++++++++++++++");
+        //console.log(report)
         if (report) 
         {
-            report.setFilters(filters);
+            report.setFilters(filters).catch
+            (
+                function (errors) 
+                {
+                console.log("error in set filter", errors);
+                }
+            );
         }
     }
     );
@@ -261,69 +277,74 @@ window.onload = function ()
     }
     function getDateFilter(colName,startDate,endDate) 
     {
+        //console.log(new Date(startDate).toISOString());
+        //console.log(moment(startDate).format());
         if(startDate!="" && endDate=="")
         {
-            var basicFilter =   
-                            {
-                                $schema: "http://powerbi.com/product/schema#advanced",
-                                target: 
-                                {
-                                    table: "Exposure",
-                                    column: colName
-                                },
-                                conditions:[
-                                    {
-                                        operator    :   "GreaterThanOrEqual",
-                                        values      :   startDate
-                                    }],
-                                filterType: models.FilterType.Advanced
-                            }
-        }
+            var dateFilter= 
+            {
+                $schema: "http://powerbi.com/product/schema#advanced",
+                target: {
+                    table   : "Exposure",
+                    column  : colName
+                },
+                logicalOperator:"And",
+                conditions:
+                [
+                    {
+                        operator    : "GreaterThanOrEqual",
+                        value       : new Date(startDate).toISOString()
+                    }
+                ],
+                filterType: models.FilterType.Advanced
+            }
+        }   
         if(startDate=="" && endDate!="")
         {
-            var basicFilter =   
-                            {
-                                $schema: "http://powerbi.com/product/schema#advanced",
-                                target: 
-                                {
-                                    table: "Exposure",
-                                    column: colName
-                                },
-                                conditions:[
-                                    {
-                                        operator    :   "LessThanOrEqual",
-                                        values      :   endDate
-                                    }],
-                                filterType: models.FilterType.Advanced
-                            }
-        }
+            var dateFilter =   
+            {
+                $schema: "http://powerbi.com/product/schema#advanced",
+                target: {
+                    table   : "Exposure",
+                    column  : colName
+                },
+                logicalOperator:"And",
+                conditions:
+                [
+                    {
+                        operator    : "LessThanOrEqual",
+                        value       : new Date(endDate).toISOString()
+                    }
+                ],
+                filterType: models.FilterType.Advanced
+            }
+        }    
         if(startDate!="" && endDate!="")
         {
-            var basicFilter =   
-                            {
-                                $schema: "http://powerbi.com/product/schema#advanced",
-                                target: 
-                                {
-                                    table: "Exposure",
-                                    column: colName
-                                },
-                                logicalOperator:"And",
-                                conditions:
-                                    [
-                                        {
-                                            operator    :   "GreaterThanOrEqual",
-                                            values      :   startDate
-                                        },
-                                        {
-                                            operator    :   "LessThanOrEqual",
-                                            values      :   endDate
-                                        }
-                                    ],
-                                filterType: models.FilterType.Advanced
-                            }
-        }
+            var dateFilter =   
+            {
+                $schema: "http://powerbi.com/product/schema#advanced",
+                target: {
+                    table: "Exposure",
+                    column: colName
+                },
+                logicalOperator:"And",
+                conditions:
+                [
+                    {
+                        operator    :  "GreaterThanOrEqual",
+                        value       :   new Date(startDate).toISOString()
+                    },
 
-        return basicFilter;            
+                    {
+                        operator    : "LessThanOrEqual",
+                        value       : new Date(endDate).toISOString()
+                    }
+                ],
+                filterType: models.FilterType.Advanced
+            }
+        }
+        return dateFilter;            
     }
 
     function getFilter(colName,colValues) 
@@ -341,7 +362,23 @@ window.onload = function ()
                             }
         return basicFilter;            
     }
+
+
+
 }
+function printPage()
+    {
+        var report = powerbi.embeds[0];
+        //var embedContainer = $('#embedContainer')[0];
+        // Get a reference to the embedded report.
+        //report = powerbi.get(embedContainer);
+        // Trigger the print dialog for your browser.
+        report.print()
+        .catch(function (errors) {
+        console.log(errors);
+    });
+    }
+
 </script>
 {%endblock%}
 
